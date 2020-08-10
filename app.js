@@ -12,7 +12,6 @@ const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pelle
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
 const app = express();
-const posts = [];
 
 app.set('view engine', 'ejs');
 
@@ -65,21 +64,33 @@ app.post("/compose",function(req,res){
     content: req.body.postBody
   });
 
-  post.save();
-  res.redirect("/");
+  post.save(function(err){
+    if(!err){
+      res.redirect("/");
+    }
+  })
 });
 
-app.get("/posts/:postName",function(req,res){
-    const postSearch = _.lowerCase(req.params.postName);
-    posts.forEach(function(post){
-      const postTitle = _.lowerCase(post.title);
-      if(postTitle === postSearch){
+app.get("/posts/:postId",function(req,res){
+    const postSearchId = req.params.postId;
+
+    Post.findOne({_id:postSearchId},function(err,post){
+      if(!err){
         res.render("post",{
           postTitle:post.title,
           postBody: post.content
         });
       }
-    });
+    })
+    // posts.forEach(function(post){
+    //   const postTitle = _.lowerCase(post.title);
+    //   if(postTitle === postSearch){
+    //     res.render("post",{
+    //       postTitle:post.title,
+    //       postBody: post.content
+    //     });
+    //   }
+    // });
 });
 
 
